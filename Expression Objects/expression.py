@@ -38,7 +38,7 @@ class Sub:
         self.R = R
 
     def derivate(self):
-        return Sub(self.L.derivate(),self.R.derivate())
+        return Sub(self.L.derivate(), self.R.derivate())
         
 class Multi:
     
