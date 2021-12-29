@@ -1,33 +1,27 @@
 import math
-class Expression:
+from dataclasses import dataclass
 
-    def __init__():
-        pass
-
-    def derivate():
-        pass
-
-#Constants
-class Constant(Expression):
-
+#--------------- Constants ---------------- #
+class Constant:
+    
     def __init__(self, X):
         self.value = X
     
     def derivate():
         return Constant(0)
             
-class e(Constant):
+class e:
 
     def __init__(self):
         self.value = math.e
 
-class pi(Constant):
+class pi:
 
     def __init__(self):
         self.value = math.pi
 
-#Operators 
-class Add(Expression):
+#--------------- Operators ---------------- #
+class Add:
     
     def __init__(self, L, R):
         self.L = L
@@ -37,7 +31,7 @@ class Add(Expression):
         return (Add(self.L.derivate(), self.R.derivate()))
         
 
-class Sub(Expression):
+class Sub:
     
     def __init__(self, L, R):
         self.L = L
@@ -46,7 +40,7 @@ class Sub(Expression):
     def derivate(self):
         return Sub(self.L.derivate(),self.R.derivate())
         
-class Multi(Expression):
+class Multi:
     
     def __init__(self, U, V, sign = 1):
         self.u = U
@@ -57,7 +51,7 @@ class Multi(Expression):
         return Add(Multi(self.U, self.V.derivate()), Multi(self.V, self.U.derivate()))
 
 # U / V = div(U, V)
-class Div(Expression):
+class Div:
        
     def __init__(self, U, V):
         self.u = U
@@ -67,7 +61,7 @@ class Div(Expression):
         return Div(Sub(Multi(self.V,self.U.derivate()),Multi(self.U,self.V.derivate())),Exponent(self.V,Constant(2)))
 
 # U ^ V
-class Exponent(Expression):
+class Exponent:
 
     def __init__(self,U,V):
         self.u=U
@@ -77,8 +71,8 @@ class Exponent(Expression):
         pass
 
 
-# Trigonometry
-class Sin(Expression):
+#--------------- Trigonometry ---------------- #
+class Sin:
     
     def __init__(self, X, sign = 1):
         self.X = X
@@ -87,7 +81,7 @@ class Sin(Expression):
     def derivate(self):
         return Multi(Cos(self.X), self.X.derivate(), self.sign)
 
-class Tan(Expression):
+class Tan:
     
     def __init__(self, X, sign = 1):
         self.X = X
@@ -96,7 +90,7 @@ class Tan(Expression):
     def derivate(self):
         return Multi(Exponent(Sec(self.X), Constant(2)), self.X.derivate(), self.sign)
 
-class Sec(Expression):
+class Sec:
     
     def __init__(self, X, sign = 1):
         self.X = X
@@ -105,7 +99,7 @@ class Sec(Expression):
     def derivate(self):
         return Multi(Multi(Sec(self.X), Tan(self.X) , self.sign), self.X.derivate())
 
-class Cos(Expression):
+class Cos:
     
     def __init__(self, X, sign):
         self.X = X
@@ -114,7 +108,7 @@ class Cos(Expression):
     def derivate(self):
         return Multi(Sin(self.X), self.X.derivate(), self.sign * -1)
 
-class Cot(Expression):
+class Cot:
     
     def __init__(self, X, sign = 1):
         self.X = X
@@ -123,7 +117,7 @@ class Cot(Expression):
     def derivate(self):
         return Multi(Exponent(Sec(self.X), Constant(2) , self.sign * -1), self.X.derivate())
 
-class Cosec(Expression):
+class Cosec:
     
     def __init__(self, X, sign = 1):
         self.X = X
