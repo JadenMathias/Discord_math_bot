@@ -2,126 +2,174 @@ import math
 from dataclasses import dataclass
 
 #--------------- Constants ---------------- #
+@dataclass
 class Constant:
     
-    def __init__(self, X):
-        self.value = X
+    value : float
     
-    def derivate():
+    def derivate(self):
         return Constant(0)
-            
+
+    def __repr__(self):
+        return f"{self.value}"
+
+@dataclass     
 class e:
 
-    def __init__(self):
-        self.value = math.e
+    value : float = math.e
+    
+    def derivate(self):
+        return Constant(0)
 
+    def __repr__(self):
+        return f"{self.value}"
+
+@dataclass
 class pi:
 
-    def __init__(self):
-        self.value = math.pi
+    value : float = math.pi
+    
+    def derivate(self):
+        return Constant(0)
+
+    def __repr__(self):
+        return f"{self.value}"
 
 #--------------- Operators ---------------- #
+
+@dataclass
 class Add:
     
-    def __init__(self, L, R):
-        self.L = L
-        self.R = R
+    L: any
+    R: any
 
+    def __repr__(self):
+        return f"({self.L} + {self.R})"
+    
     def derivate(self):
         return (Add(self.L.derivate(), self.R.derivate()))
-        
 
+        
+@dataclass
 class Sub:
     
-    def __init__(self, L, R):
-        self.L = L
-        self.R = R
+    L: any
+    R: any
+
+    def __repr__(self):
+        return f"({self.L} - {self.R})"
 
     def derivate(self):
         return Sub(self.L.derivate(), self.R.derivate())
-        
+
+@dataclass       
 class Multi:
     
-    def __init__(self, U, V, sign = 1):
-        self.u = U
-        self.v = V
-        self.sign = sign
+    L: any
+    R: any
+
+    def __repr__(self):
+        return f"({self.L} * {self.R})"
 
     def derivate(self):
         return Add(Multi(self.U, self.V.derivate()), Multi(self.V, self.U.derivate()))
 
 # U / V = div(U, V)
+@dataclass
 class Div:
        
-    def __init__(self, U, V):
-        self.u = U
-        self.v = V
+    U: any
+    V: any
+
+    def __repr__(self):
+        return f"({self.U} / {self.V})"
 
     def derivate(self):
         return Div(Sub(Multi(self.V,self.U.derivate()),Multi(self.U,self.V.derivate())),Exponent(self.V,Constant(2)))
 
 # U ^ V
+@dataclass
 class Exponent:
 
-    def __init__(self,U,V):
-        self.u=U
-        self.v=V
+    U: any
+    V: any
+
+    def __repr__(self):
+        return f"({self.U} ^ {self.R})"
+
     
     def derivate():
         pass
 
 
 #--------------- Trigonometry ---------------- #
+
+@dataclass
 class Sin:
     
-    def __init__(self, X, sign = 1):
-        self.X = X
-        self.sign = sign
+    X: any
+
+    def __repr__(self):
+        return f"sin({self.X})"
 
     def derivate(self):
-        return Multi(Cos(self.X), self.X.derivate(), self.sign)
+        return Multi(Cos(self.X), self.X.derivate())
 
+@dataclass
 class Tan:
     
-    def __init__(self, X, sign = 1):
-        self.X = X
-        self.sign = sign
+    X: any
+
+    def __repr__(self):
+        return f"tan({self.X})"
 
     def derivate(self):
-        return Multi(Exponent(Sec(self.X), Constant(2)), self.X.derivate(), self.sign)
+        return Multi(Exponent(Sec(self.X), Constant(2)), self.X.derivate())
 
+@dataclass
 class Sec:
     
-    def __init__(self, X, sign = 1):
-        self.X = X
-        self.sign = sign
+    X: any
+
+    def __repr__(self):
+        return f"sec({self.X})"
 
     def derivate(self):
-        return Multi(Multi(Sec(self.X), Tan(self.X) , self.sign), self.X.derivate())
+        return Multi(Multi(Sec(self.X), Tan(self.X)), self.X.derivate())
 
+#TODO: Add Unary minus to the below derivate functions
+
+@dataclass
 class Cos:
     
-    def __init__(self, X, sign):
-        self.X = X
-        self.sign = sign
+    X: any
+
+    def __repr__(self):
+        return f"cos({self.X})"
 
     def derivate(self):
-        return Multi(Sin(self.X), self.X.derivate(), self.sign * -1)
+        return Multi(Sin(self.X), self.X.derivate())
 
+@dataclass
 class Cot:
     
-    def __init__(self, X, sign = 1):
-        self.X = X
-        self.sign = sign
+    X: any
+
+    def __repr__(self):
+        return f"cot({self.X})"
 
     def derivate(self):
-        return Multi(Exponent(Sec(self.X), Constant(2) , self.sign * -1), self.X.derivate())
+        return Multi(Exponent(Sec(self.X), Constant(2)), self.X.derivate())
 
+@dataclass
 class Cosec:
     
-    def __init__(self, X, sign = 1):
-        self.X = X
-        self.sign = sign
+    X: any
+
+    def __repr__(self):
+        return f"cosec({self.X})"
 
     def derivate(self):
-        return Multi(Multi(Cosec(self.X), Cot(self.X) , self.sign * -1), self.X.derivate())
+        return Multi(Multi(Cosec(self.X), Cot(self.X)), self.X.derivate())
+
+#TODO: Unary operator nodes
