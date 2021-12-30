@@ -1,3 +1,23 @@
+"""
+    This module describes properties for each math expression element, we use these 
+    objects to represent our Elements to perform more complex arithmetic functions.
+
+    currently supports: 
+
+    1. Derivatives
+     - Each expression has a derivate() method, following the basic 
+       rules of differentiation.
+
+    2. Simplification:
+     - Each expression has a simplify() method, following basic rules
+       of arithmetic simplification()
+    
+    3. Representation:
+     - Each expression has a readable arithmetic representation via the
+       __repr__() methods
+"""
+
+
 import math
 from dataclasses import dataclass
 
