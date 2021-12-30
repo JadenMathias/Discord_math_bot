@@ -2,16 +2,19 @@ from elements import *
 
 WHITESPACE = ' \n\t'
 DIGITS = '0123456789'
-VTL = { 'sin' : Element(ElementType.SIN), 'cos' : Element(ElementType.COS), 'tan' : Element(ElementType.TAN),
-         'sec' : Element(ElementType.SEC), 'cosec' : Element(ElementType.COSEC),'cot' : Element(ElementType.COT),
-         'pi'  : Element(ElementType.PI),  'e' : Element(ElementType.E), 'log' : Element(ElementType.LOG) }
+VTL = { 'sin' : Element(ElementType.SIN), 'cos'   : Element(ElementType.COS),  'tan' : Element(ElementType.TAN),
+        'sec' : Element(ElementType.SEC), 'cosec' : Element(ElementType.COSEC),'cot' : Element(ElementType.COT),
+        'pi'  : Element(ElementType.PI),  'e'     : Element(ElementType.E),    'log' : Element(ElementType.LOG) }
 
 class Lexer:
+    
     def __init__(self,text):
+        
         self.text = iter(text)
         self.advance()
     
     def advance(self):
+
        try:
            self.char = next(self.text)
        except StopIteration:
@@ -52,8 +55,10 @@ class Lexer:
                 raise Exception(f"Illegal Character: '{self.char}'")
       
     def generate_vtl(self):
+
         string = self.char
         self.advance()
+
         while self.char != None and self.char.isalpha():
             string = string + self.char
             self.advance()
@@ -65,6 +70,7 @@ class Lexer:
             return Element(ElementType.VAR, string)
 
     def generate_number(self):
+        
         decimal_count = 0
         number_str = self.char
         self.advance()
