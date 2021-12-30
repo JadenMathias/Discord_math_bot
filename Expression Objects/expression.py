@@ -21,6 +21,8 @@
 import math
 from dataclasses import dataclass
 
+#TODO: Implement variable substituition and expression evaluation
+
 #--------------- Variable  ---------------- #
 
 @dataclass
@@ -44,7 +46,7 @@ class Variable:
 @dataclass
 class Constant:
     
-    value : float
+    value : float = 0.0
     
     def derivate(self, x : str = 'x'):
         return Constant(0)
@@ -56,7 +58,7 @@ class Constant:
         return f"{self.value}"
 
 @dataclass     
-class e:
+class Euler:
 
     value : float = math.e
     
@@ -67,7 +69,7 @@ class e:
         return self
 
     def __repr__(self):
-        return f"{self.value}"
+        return "e"
 
 @dataclass
 class pi:
@@ -81,7 +83,7 @@ class pi:
         return self
 
     def __repr__(self):
-        return f"{self.value}"
+        return "pi"
 
 #--------------- Operators ---------------- #
 
@@ -187,11 +189,13 @@ class Exponent:
             return Constant(1)
         elif self.V == Constant(1):
             return self.U.simplify()
-
         return Exponent(self.U.simplify(),self.V.simplify())
-
+    
+    #TODO: Fix derivative for exponent
     def derivate(self, x : str = 'x'):
-        return Multi(self,Multi(self.U, Log(self.v)).derivate(x))
+        if type(self.U) != type(Constant()) and type(self.V) == type(Constant()):
+            return Multi(Multi(self.V ,Exponent(self.U,Sub(self.V,Constant(1)))), self.U.derivate())
+        return Multi(Exponent(self.U,self.V),(Multi(self.U, Log(self.V))).derivate(x))
 
 @dataclass
 class uMinus:

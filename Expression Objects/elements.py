@@ -35,3 +35,6 @@ class Element:
 
     type : ElementType 
     value: any = None
+
+    def __repr__(self):
+        return f"{self.type.name}: {self.value}"
