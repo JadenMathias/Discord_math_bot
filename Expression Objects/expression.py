@@ -30,11 +30,17 @@ class Variable:
 
     value : str = 'x'
 
-    def derivate(self, x : str = 'x'):
-        if self.value == x:
+    def derivate(self, x):
+        if self.value == x.value:
             return Constant(1)
         else:
-            return Variable(self.value+"'")
+            return Derivable(Variable(self.value), self)
+
+    def substitute(self, x : str, y):
+        if self.value == x:
+            return y
+        else:
+            return self
     
     def simplify(self):
         return self
@@ -42,13 +48,39 @@ class Variable:
     def __repr__(self):
         return self.value
 
+# Represents variable meant to be derivated
+#TODO : Complete Derivable 'dy/dx'
+@dataclass
+class Derivable:
+    
+    dy : Variable = Variable('y')
+    dx : Variable = Variable()
+
+    def derivate(self, x = Variable()):
+        pass
+        #return Derivable(self,x)
+
+    def substitute(self, x : str, y):
+        pass
+        #if self.value == x:
+        #    return y.derivate()
+        #else:
+        #    return self
+
+    def simplify(self):
+        return self
+
+    def __repr__(self):
+        return self.dy.value + "'"
+
+#TODO: Implement Substitute methods for every expression
 #--------------- Constants ---------------- #
 @dataclass
 class Constant:
     
     value : float = 0.0
     
-    def derivate(self, x : str = 'x'):
+    def derivate(self, x = Variable()):
         return Constant(0)
 
     def simplify(self):
@@ -62,7 +94,7 @@ class Euler:
 
     value : float = math.e
     
-    def derivate(self, x : str = 'x'):
+    def derivate(self, x = Variable()):
         return Constant(0)
 
     def simplify(self):
@@ -76,7 +108,7 @@ class pi:
 
     value : float = math.pi
     
-    def derivate(self, x : str = 'x'):
+    def derivate(self, x = Variable()):
         return Constant(0)
 
     def simplify(self):
@@ -104,7 +136,7 @@ class Add:
 
         return Add(self.L.simplify(),self.R.simplify())
 
-    def derivate(self, x : str = 'x'):
+    def derivate(self, x = Variable()):
         return (Add(self.L.derivate(x), self.R.derivate(x)))
 
         
@@ -125,7 +157,7 @@ class Sub:
 
         return Sub(self.L.simplify(),self.R.simplify())
 
-    def derivate(self, x : str = 'x'):
+    def derivate(self, x = Variable()):
         return Sub(self.L.derivate(x), self.R.derivate(x))
 
 @dataclass       
@@ -147,7 +179,7 @@ class Multi:
 
         return Multi(self.L.simplify(),self.R.simplify())
 
-    def derivate(self, x : str = 'x'):
+    def derivate(self, x = Variable()):
         return Add(Multi(self.L, self.R.derivate(x)), Multi(self.R, self.L.derivate(x)))
 
 @dataclass
@@ -167,7 +199,7 @@ class Div:
         
         return Div(self.U.simplify(),self.V.simplify())
 
-    def derivate(self, x : str = 'x'):
+    def derivate(self, x = Variable()):
         return Div(Sub(Multi(self.V,self.U.derivate(x)),Multi(self.U,self.V.derivate(x))),Exponent(self.V,Constant(2)))
 
 @dataclass
@@ -191,11 +223,9 @@ class Exponent:
             return self.U.simplify()
         return Exponent(self.U.simplify(),self.V.simplify())
     
-    #TODO: Fix derivative for exponent
-    def derivate(self, x : str = 'x'):
-        if type(self.U) != type(Constant()) and type(self.V) == type(Constant()):
-            return Multi(Multi(self.V ,Exponent(self.U,Sub(self.V,Constant(1)))), self.U.derivate())
-        return Multi(Exponent(self.U,self.V),(Multi(self.U, Log(self.V))).derivate(x))
+    def derivate(self, x = Variable()):
+        g = (Multi(self.V, Log(self.U))).derivate(x)
+        return Multi(Exponent(self.U,self.V), g)
 
 @dataclass
 class uMinus:
@@ -211,7 +241,7 @@ class uMinus:
 
         return uMinus(self.X.simplify())
     
-    def derivate(self, x : str = 'x'):
+    def derivate(self, x = Variable()):
         return uMinus(self.X.derivate(x))
 
 @dataclass
@@ -228,7 +258,7 @@ class uPlus:
             
         return uPlus(self.X.simplify())
     
-    def derivate(self, x : str = 'x'):
+    def derivate(self, x = Variable()):
         return uPlus(self.X.derivate(x))
 
 
@@ -245,7 +275,7 @@ class Sin:
     def simplify(self):
         return Sin(self.X.simplify())
 
-    def derivate(self, x : str = 'x'):
+    def derivate(self, x = Variable()):
         return Multi(Cos(self.X), self.X.derivate(x))
 
 @dataclass
@@ -259,7 +289,7 @@ class Tan:
     def simplify(self):
         return Tan(self.X.simplify())
 
-    def derivate(self, x : str = 'x'):
+    def derivate(self, x = Variable()):
         return Multi(Exponent(Sec(self.X), Constant(2)), self.X.derivate(x))
 
 @dataclass
@@ -273,7 +303,7 @@ class Sec:
     def simplify(self):
         return Sec(self.X.simplify())
 
-    def derivate(self, x : str = 'x'):
+    def derivate(self, x = Variable()):
         return Multi(Multi(Sec(self.X), Tan(self.X)), self.X.derivate(x))
 
 
@@ -288,7 +318,7 @@ class Cos:
     def simplify(self):
         return Cos(self.X.simplify())
 
-    def derivate(self, x : str = 'x'):
+    def derivate(self, x = Variable()):
         return Multi(uMinus(Sin(self.X)), self.X.derivate(x))
 
 @dataclass
@@ -302,7 +332,7 @@ class Cot:
     def simplify(self):
         return Cot(self.X.simplify())
 
-    def derivate(self, x : str = 'x'):
+    def derivate(self, x = Variable()):
         return Multi(uMinus(Exponent(Sec(self.X), Constant(2))), self.X.derivate(x))
 
 @dataclass
@@ -316,7 +346,7 @@ class Cosec:
     def simplify(self):
         return Cosec(self.X.simplify())
 
-    def derivate(self, x : str = 'x'):
+    def derivate(self, x = Variable()):
         return Multi(uMinus(Multi(Cosec(self.X), Cot(self.X))), self.X.derivate(x))
 
 @dataclass
@@ -330,6 +360,6 @@ class Log:
     def simplify(self):
         return Log(self.X.simplify())
 
-    def derivate(self, x : str = 'x'):
+    def derivate(self, x = Variable()):
         return Multi(Div(Constant(1),self.X), self.X.derivate(x))
 
