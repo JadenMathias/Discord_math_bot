@@ -73,7 +73,7 @@ class Derivable:
     def __repr__(self):
         return self.dy.value + "'"
 
-#TODO: Implement Substitute methods for every expression
+#TODO: Add simplification methods for every expression
 #--------------- Constants ---------------- #
 @dataclass
 class Constant:
@@ -160,28 +160,6 @@ class Sub:
     def derivate(self, x = Variable()):
         return Sub(self.L.derivate(x), self.R.derivate(x))
 
-@dataclass       
-class Multi:
-    
-    L: any
-    R: any
-
-    def __repr__(self):
-        return f"({self.L} * {self.R})"
-    
-    def simplify(self):
-        if self.L == Constant(0) or self.R == Constant(0):
-            return Constant(0)
-        elif self.L == Constant(1):
-            return self.R.simplify()
-        elif self.R == Constant(1):
-            return self.L.simplify()
-
-        return Multi(self.L.simplify(),self.R.simplify())
-
-    def derivate(self, x = Variable()):
-        return Add(Multi(self.L, self.R.derivate(x)), Multi(self.R, self.L.derivate(x)))
-
 @dataclass
 class Div:
        
@@ -201,6 +179,45 @@ class Div:
 
     def derivate(self, x = Variable()):
         return Div(Sub(Multi(self.V,self.U.derivate(x)),Multi(self.U,self.V.derivate(x))),Exponent(self.V,Constant(2)))
+        
+@dataclass       
+class Multi:
+    
+    L: any
+    R: any
+
+    def __repr__(self):
+        return f"({self.L} * {self.R})" 
+    
+    def simplify(self):
+        if self.L == Constant(0) or self.R == Constant(0):
+            return Constant(0)
+        elif self.L == Constant(1):
+            return self.R.simplify()
+        elif self.R == Constant(1):
+            return self.L.simplify()
+        try:
+            if self.R == Div(Constant(1),self.R.V) or self.L == Div(Constant(1),self.L.V):
+                if self.R == Div(Constant(1),self.R.V):
+                    return Div(self.L.simplify(),self.R.V.simplify()).simplify()
+                elif self.L == Div(Constant(1),self.L.V):
+                    return Div(self.R.simplify(),self.L.V.simplify()).simplify()
+        except:
+            pass
+        
+        #TODO
+        try:
+            pass
+        except:
+            pass
+
+        return Multi(self.L.simplify(),self.R.simplify())
+        
+
+    def derivate(self, x = Variable()):
+        return Add(Multi(self.L, self.R.derivate(x)), Multi(self.R, self.L.derivate(x)))
+
+
 
 @dataclass
 class Exponent:
