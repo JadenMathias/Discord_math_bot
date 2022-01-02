@@ -7,7 +7,7 @@ from processor import Processor
 from discord.ext import commands
 from dotenv import load_dotenv
 
-BOT_TOKEN = os.getenv('BOT_TOKEN')
+BOT_TOKEN = os.environ.get('BOT_TOKEN')
 
 client = commands.Bot(command_prefix = '>' , help_command=None)
 
