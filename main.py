@@ -1,11 +1,15 @@
-import discord
 import sys
 sys.path.insert(0, 'D:\Desktop\Projects\Discord_math_bot\Expression Objects')
+import discord
+import os
 from expression import Variable
 from processor import Processor
 from discord.ext import commands
+from dotenv import load_dotenv
 
-client = commands.Bot(command_prefix = '>')
+BOT_TOKEN = os.getenv('BOT_TOKEN')
+
+client = commands.Bot(command_prefix = '>' , help_command=None)
 
 def dydx(exp , wrt):
     parser = Processor()
@@ -24,12 +28,24 @@ async def on_ready():
 
 @client.command()
 async def help(ctx):
-    await ctx.send("Use :  derivate 'enter expression here' 'variable here'  \n ( Make sure to encapsulate the expression in double quotes)")
+   await ctx.send("""
+Commands:\n
+derivate \"Expression\" 'Variable'\n
+Usage:\n
+Expression example : "-sin(x) + 2 * log(3^x - 1/x)"
+   """)
+
 
 @client.command()
-async def derivate(ctx, expression, wrt): 
-    x = dydx(expression,wrt)
-    await ctx.send(x)
+async def derivate(ctx, expression, wrt = None):
+    try:
+        if wrt == None:
+            await ctx.send("Try again! No variable to derivate with was found! Use help if lost :)")
+            return
+        x = dydx(expression,wrt)
+        await ctx.send(x)
+    except:
+        await ctx.send("Incorrect usage of command/expression. Use help if lost :)")
 
     
-client.run('OTI1NDQwNjczNDIxODY5MTE2.YctJyg.S8Q_wRjoDrsXgmu_TjG-Cxgg1Pw')
+client.run(BOT_TOKEN)

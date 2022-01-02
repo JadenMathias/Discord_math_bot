@@ -221,6 +221,8 @@ class Div:
             return Constant(0)
         elif self.V == Constant(1):
             return self.U.simplify()
+        elif self.U == self.V:
+            return Constant(1)
         
         return Div(self.U.simplify(),self.V.simplify())
 
@@ -246,12 +248,6 @@ class Multi:
                     return Div(self.L.simplify(),self.R.V.simplify()).simplify()
                 elif self.L == Div(Constant(1),self.L.V):
                     return Div(self.R.simplify(),self.L.V.simplify()).simplify()
-        except:
-            pass
-        
-        #TODO
-        try:
-            pass
         except:
             pass
 
