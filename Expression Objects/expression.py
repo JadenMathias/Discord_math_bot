@@ -79,7 +79,7 @@ class Derivable:
     def __str__(self):
         return self.dy.value + "'"
 
-#TODO: Implement Substitute methods for every expression
+#TODO: Add simplification methods for every expression
 #--------------- Constants ---------------- #
 @dataclass
 class Constant:
@@ -207,6 +207,26 @@ class Sub:
     def __str__(self):
         return f"({self.L} - {self.R})"
 
+@dataclass
+class Div:
+       
+    U: any
+    V: any
+
+    def __repr__(self):
+        return f"({self.U} / {self.V})"
+    
+    def simplify(self):
+        if self.U == Constant(0):
+            return Constant(0)
+        elif self.V == Constant(1):
+            return self.U.simplify()
+        
+        return Div(self.U.simplify(),self.V.simplify())
+
+    def derivate(self, x = Variable()):
+        return Div(Sub(Multi(self.V,self.U.derivate(x)),Multi(self.U,self.V.derivate(x))),Exponent(self.V,Constant(2)))
+        
 @dataclass       
 class Multi:
     
@@ -220,8 +240,23 @@ class Multi:
             return self.R.simplify()
         elif self.R == Constant(1):
             return self.L.simplify()
+        try:
+            if self.R == Div(Constant(1),self.R.V) or self.L == Div(Constant(1),self.L.V):
+                if self.R == Div(Constant(1),self.R.V):
+                    return Div(self.L.simplify(),self.R.V.simplify()).simplify()
+                elif self.L == Div(Constant(1),self.L.V):
+                    return Div(self.R.simplify(),self.L.V.simplify()).simplify()
+        except:
+            pass
+        
+        #TODO
+        try:
+            pass
+        except:
+            pass
 
         return Multi(self.L.simplify(),self.R.simplify())
+        
 
     def derivate(self, x = Variable()):
         return Add(Multi(self.L, self.R.derivate(x)), Multi(self.R, self.L.derivate(x)))
